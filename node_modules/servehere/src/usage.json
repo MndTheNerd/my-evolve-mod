@@ -1,0 +1,17 @@
+{
+  "title": "servehere",
+  "description": "Sets up a webserver immediately for this directory",
+  "synopsis": [
+    "$ servehere",
+    "$ servehere -j",
+    "$ servehere --jsonapi",
+    "$ servehere -c",
+    "$ servehere --cors",
+    "$ servehere -d ./docs",
+    "$ servehere --directory ./docs",
+    "$ servehere 3000",
+    "$ servehere --port 3000",
+    "$ servehere --mime customMime.json"
+  ],
+  "footer": "Project home: [underline]{https://github.com/StoneCypher/servehere/}"
+}
