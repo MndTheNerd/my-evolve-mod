@@ -8,7 +8,7 @@ import { clearSpyopDrag } from './governor.js';
 import { defineIndustry, setPowerGrid, gridDefs, clearGrids } from './industry.js';
 import { defineGovernment, defineGarrison, buildGarrison, commisionGarrison, foreignGov } from './civics.js';
 import { races, shapeShift, renderPsychicPowers, renderSupernatural } from './races.js';
-import { drawEvolution, drawCity, drawTech, resQueue, clearResDrag } from './actions.js';
+import { actions, drawEvolution, drawCity, drawTech, resQueue, clearResDrag, checkTechRequirements } from './actions.js';
 import { renderSpace, ascendLab, terraformLab } from './space.js';
 import { renderFortress, buildFortress, drawMechLab, clearMechDrag, drawHellObservations } from './portal.js';
 import { renderEdenic } from './edenic.js';
@@ -1555,6 +1555,12 @@ export function drawCheats() {
                      <b-field label="Time Warp (Speed Multiplier)">
                          <b-numberinput v-model="c.time_warp" :min="1" :max="100" :controls="true"></b-numberinput>
                      </b-field>
+                     <b-field label="Smart Build Queue (Auto-build any affordable)">
+                         <b-switch v-model="s.qAny">Enable Smart Queue</b-switch>
+                     </b-field>
+                     <b-field label="Instant Tech Unlock">
+                         <button class="button is-warning" @click="unlockTechs">Unlock All Available Techs</button>
+                     </b-field>
                  </div>
                  <div class="column is-12">
                      <h3 class="subtitle is-5 has-text-info">Resource Management</h3>
@@ -1600,7 +1606,8 @@ export function drawCheats() {
         el: `#mTabCheats`,
         data: {
             c: global.cheats,
-            r: global.resource
+            r: global.resource,
+            s: global.settings
         },
         methods: {
             setToMax(name) {
@@ -1618,6 +1625,18 @@ export function drawCheats() {
                 if (!global.cheats.lock_overrides) this.$set(global.cheats, 'lock_overrides', {});
                 this.$set(global.cheats.lock_overrides, name + '_enabled', enabled);
                 this.$set(global.cheats.lock_overrides, name + '_val', val);
+            },
+            unlockTechs() {
+                if (!actions.tech) return;
+                Object.keys(actions.tech).forEach(techId => {
+                    if (!global.tech[techId] && checkTechRequirements(techId, false)) {
+                        global.tech[techId] = 1;
+                        if (typeof gainTech === 'function') {
+                            gainTech(techId);
+                        }
+                    }
+                });
+                drawTech();
             }
         },
         watch: {
