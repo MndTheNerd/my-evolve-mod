@@ -12891,6 +12891,7 @@ function buildGene(blockGeneBuffer = false) {
 }
 
 function diffCalc(res, period) {
+    if (!period || period <= 0) { return; }
     let sec = 1000;
     if (global.race['slow']) {
         let slow = 1 + (traits.slow.vars()[0] / 100);
