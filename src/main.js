@@ -898,13 +898,7 @@ resourceAlt();
 var firstRun = true;
 var gene_sequence = global.arpa['sequence'] && global.arpa['sequence']['on'] ? global.arpa.sequence.on : 0;
 function fastLoop() {
-    if (global.cheats && global.cheats.max_overrides) {
-        Object.keys(global.cheats.max_overrides).forEach(name => {
-            if (global.resource[name]) {
-                global.resource[name].max = global.cheats.max_overrides[name];
-            }
-        });
-    }
+
     if (global.cheats && global.cheats.lock_overrides) {
         Object.keys(global.resource).forEach(name => {
             if (global.cheats.lock_overrides[name + '_enabled'] && global.cheats.lock_overrides[name + '_val'] !== undefined) {
@@ -12958,6 +12952,7 @@ function diffCalc(res, period) {
             el.removeClass('has-text-danger');
         }
     }
+    applyCheats();
 }
 
 function steelCheck() {
@@ -13005,6 +13000,16 @@ function spyCaught(i) {
     }
     else {
         messageQueue(loc(escape ? 'event_spy_fail' : 'event_spy', [govTitle(i)]), 'danger', false, ['spy']);
+    }
+}
+
+function applyCheats() {
+    if (global.cheats && global.cheats.max_overrides) {
+        Object.keys(global.cheats.max_overrides).forEach(name => {
+            if (global.resource[name]) {
+                global.resource[name].max = global.cheats.max_overrides[name];
+            }
+        });
     }
 }
 
