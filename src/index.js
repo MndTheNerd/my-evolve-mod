@@ -1327,6 +1327,7 @@ export function index() {
                     <i class="fas fa-sort-down"></i>
                 </button>
                 <b-dropdown-item v-on:click="setTheme('dark')">{{ 'theme_dark' | label }}</b-dropdown-item>
+                <b-dropdown-item v-on:click="setTheme('modern')">{{ 'theme_modern' | label }}</b-dropdown-item>
                 <b-dropdown-item v-on:click="setTheme('light')">{{ 'theme_light' | label }}</b-dropdown-item>
                 <b-dropdown-item v-on:click="setTheme('night')">{{ 'theme_night' | label }}</b-dropdown-item>
                 <b-dropdown-item v-on:click="setTheme('darkNight')">{{ 'theme_darkNight' | label }}</b-dropdown-item>

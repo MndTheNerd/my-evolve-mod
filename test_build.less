@@ -1,0 +1,13 @@
+#lib {
+    .themes() {
+        .modern() {
+            @bg: blue;
+            color: @bg;
+        }
+    }
+}
+
+html.modern {
+    #lib.themes.modern();
+    border: 1px solid red;
+}
