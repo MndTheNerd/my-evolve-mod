@@ -1540,64 +1540,109 @@ export function drawCheats() {
     var content = $(`
         <div class="cheats container" style="padding: 1rem;">
              <h2 class="title is-4 has-text-warning">Cheat Menu</h2>
-             <div class="columns is-multiline">
-                 <div class="column is-12">
-                     <b-switch v-model="c.enabled">Enable Cheats</b-switch>
-                     </b-field>
-                     <b-field label="Research Cost Multiplier (e.g. 0.01 for 1%)">
-                         <b-numberinput v-model="c.research_cost" :step="0.01" :min="0" :max="1" :controls="true"></b-numberinput>
-                     </b-field>
-                     <b-field label="One-Click Evolve">
-                         <b-switch v-model="c.one_click_evolve">Enable One-Click Evolve</b-switch>
-                     </b-field>
-                     <b-field label="God Mode (Free Build/Research)">
-                         <b-switch v-model="c.god_mode">Enable God Mode</b-switch>
-                     </b-field>
-                     <b-field label="Time Warp (Speed Multiplier)">
-                         <b-numberinput v-model="c.time_warp" :min="1" :max="100" :controls="true"></b-numberinput>
-                     </b-field>
-                     <b-field label="Smart Build Queue (Auto-build any affordable)">
-                         <b-switch v-model="s.qAny">Enable Smart Queue</b-switch>
-                     </b-field>
-                     <b-field label="Instant Tech Unlock">
-                         <button class="button is-warning" @click="unlockTechs">Unlock All Available Techs</button>
-                     </b-field>
-                 </div>
-                 <div class="column is-12">
-                     <h3 class="subtitle is-5 has-text-info">Resource Management</h3>
-                     <div style="max-height: 60vh; overflow-y: auto;">
-                        <div class="columns is-multiline is-mobile">
-                            <div class="column is-12-mobile is-6-tablet is-4-desktop" v-for="(res, name) in r" :key="name" v-if="res.display">
-                                <div class="box" style="height: 100%;">
-                                    <h4 class="title is-6">{{ name }}</h4>
-                                    
-                                    <b-field label="Current Amount" custom-class="is-small">
-                                        <b-input v-model.number="res.amount" type="number" size="is-small"></b-input>
-                                    </b-field>
-                                    
-                                    <b-field label="Max Amount" custom-class="is-small">
-                                        <b-input v-model.number="res.max" type="number" size="is-small" @input="updateMax(name, res.max)"></b-input>
-                                    </b-field>
-                                    
-                                    <b-field label="Lock Value" custom-class="is-small">
-                                        <div class="field has-addons">
-                                            <p class="control">
-                                                <b-checkbox-button v-model="c.lock_overrides[name + '_enabled']" @input="updateLock(name, c.lock_overrides[name + '_enabled'], c.lock_overrides[name + '_val'])" type="is-warning" size="is-small">
-                                                    <span v-if="c.lock_overrides[name + '_enabled']">Locked</span>
-                                                    <span v-else>Unlock</span>
-                                                </b-checkbox-button>
-                                            </p>
-                                            <p class="control is-expanded">
-                                                <input class="input is-small" type="number" v-model.number="c.lock_overrides[name + '_val']" @input="updateLock(name, c.lock_overrides[name + '_enabled'], c.lock_overrides[name + '_val'])" placeholder="Min Value">
-                                            </p>
-                                        </div>
-                                    </b-field>
+             
+             <!-- Global Controls -->
+             <div class="box cheat-controls mb-4">
+                <h3 class="subtitle is-6 has-text-grey-light mb-3">Global Settings</h3>
+                <div class="columns is-multiline is-gapless">
+                    <div class="column is-6-tablet is-3-desktop p-2">
+                        <b-switch v-model="c.enabled" type="is-success" size="is-small">Enable Cheats</b-switch>
+                    </div>
+                    <div class="column is-6-tablet is-3-desktop p-2">
+                        <b-switch v-model="c.one_click_evolve" type="is-success" size="is-small">One-Click Evolve</b-switch>
+                    </div>
+                    <div class="column is-6-tablet is-3-desktop p-2">
+                        <b-switch v-model="c.god_mode" type="is-success" size="is-small">God Mode</b-switch>
+                    </div>
+                    <div class="column is-6-tablet is-3-desktop p-2">
+                        <b-switch v-model="s.qAny" type="is-success" size="is-small">Smart Queue</b-switch>
+                    </div>
+                </div>
+                
+                <hr class="dropdown-divider my-3">
+                
+                <div class="columns is-multiline is-vcentered">
+                    <div class="column is-12-tablet is-6-desktop">
+                        <b-field label="Research Cost (0.01 = 1%)" custom-class="is-small" horizontal>
+                            <b-numberinput v-model="c.research_cost" :step="0.01" :min="0" :max="1" size="is-small" controls-position="compact"></b-numberinput>
+                        </b-field>
+                    </div>
+                    <div class="column is-12-tablet is-6-desktop">
+                        <b-field label="Time Warp (Speed Multiplier)" custom-class="is-small" horizontal>
+                            <b-numberinput v-model="c.time_warp" :min="1" :max="100" size="is-small" controls-position="compact"></b-numberinput>
+                        </b-field>
+                    </div>
+                    <div class="column is-12 has-text-right">
+                         <button class="button is-small is-warning is-light" @click="unlockTechs">
+                            <span class="icon is-small"><i class="fas fa-unlock"></i></span>
+                            <span>Unlock All Techs</span>
+                         </button>
+                    </div>
+                </div>
+             </div>
 
-                                    <button class="button is-small is-danger is-fullwidth" @click="setToMax(name)" style="margin-top: 0.5rem;">Max Out</button>
-                                </div>
-                            </div>
-                        </div>
-                     </div>
+             <!-- Resource Management -->
+             <div class="box p-0" style="overflow: hidden;">
+                 <div class="p-3 has-background-white-ter level is-mobile">
+                    <div class="level-left">
+                        <h3 class="subtitle is-5 has-text-info mb-0">Resources</h3>
+                    </div>
+                    <div class="level-right">
+                        <b-field class="mb-0">
+                            <b-input v-model="searchQuery" placeholder="Search resources..." type="search" icon="search" size="is-small" rounded></b-input>
+                        </b-field>
+                    </div>
+                 </div>
+                 
+                 <div class="table-container" style="max-height: 60vh; overflow-y: auto;">
+                    <table class="table is-striped is-hoverable is-fullwidth is-narrow">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Resource</th>
+                                <th style="width: 25%;">Current</th>
+                                <th style="width: 25%;">Max Override</th>
+                                <th style="width: 30%;">Lock Value</th>
+                                <th style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(res, name) in filteredResources" :key="name">
+                                <td class="is-vcentered"><b class="has-text-grey-dark">{{ name }}</b></td>
+                                <td>
+                                    <b-input v-model.number="res.amount" type="number" size="is-small" style="width: 100%;"></b-input>
+                                </td>
+                                <td>
+                                    <div class="field has-addons mb-0">
+                                        <div class="control is-expanded">
+                                            <input class="input is-small" type="number" v-model.number="res.max" @input="updateMax(name, res.max)" placeholder="Default">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="field has-addons mb-0">
+                                        <p class="control">
+                                            <button class="button is-small" :class="c.lock_overrides[name + '_enabled'] ? 'is-danger' : 'is-light'" @click="toggleLock(name)">
+                                                <span class="icon is-small"><i class="fas" :class="c.lock_overrides[name + '_enabled'] ? 'fa-lock' : 'fa-lock-open'"></i></span>
+                                            </button>
+                                        </p>
+                                        <p class="control is-expanded">
+                                            <input class="input is-small" type="number" v-model.number="c.lock_overrides[name + '_val']" @input="updateLockVal(name, c.lock_overrides[name + '_val'])" :disabled="!c.lock_overrides[name + '_enabled']" placeholder="Min Value">
+                                        </p>
+                                    </div>
+                                </td>
+                                <td class="is-vcentered has-text-centered">
+                                    <button class="button is-small is-primary is-light" @click="setToMax(name)" title="Fill Storage">
+                                        <span class="icon is-small"><i class="fas fa-arrow-up"></i></span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-if="Object.keys(filteredResources).length === 0">
+                                <td colspan="5" class="has-text-centered py-4 has-text-grey-light">
+                                    No resources found matching "{{ searchQuery }}"
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                  </div>
              </div>
         </div>
@@ -1608,7 +1653,30 @@ export function drawCheats() {
         data: {
             c: global.cheats,
             r: global.resource,
-            s: global.settings
+            s: global.settings,
+            searchQuery: ''
+        },
+        computed: {
+            filteredResources() {
+                if (!this.searchQuery) {
+                    // Filter mainly for displayed resources to reduce clutter
+                    const result = {};
+                    Object.keys(this.r).forEach(key => {
+                        if (this.r[key].display) {
+                            result[key] = this.r[key];
+                        }
+                    });
+                    return result;
+                }
+                const lowerQuery = this.searchQuery.toLowerCase();
+                const result = {};
+                Object.keys(this.r).forEach(key => {
+                    if (this.r[key].display && key.toLowerCase().includes(lowerQuery)) {
+                        result[key] = this.r[key];
+                    }
+                });
+                return result;
+            }
         },
         methods: {
             setToMax(name) {
@@ -1622,9 +1690,17 @@ export function drawCheats() {
                 if (!global.cheats.max_overrides) this.$set(global.cheats, 'max_overrides', {});
                 this.$set(global.cheats.max_overrides, name, val);
             },
-            updateLock(name, enabled, val) {
+            toggleLock(name) {
                 if (!global.cheats.lock_overrides) this.$set(global.cheats, 'lock_overrides', {});
-                this.$set(global.cheats.lock_overrides, name + '_enabled', enabled);
+                let current = global.cheats.lock_overrides[name + '_enabled'];
+                this.$set(global.cheats.lock_overrides, name + '_enabled', !current);
+                // Ensure val exists
+                if (global.cheats.lock_overrides[name + '_val'] === undefined) {
+                    this.$set(global.cheats.lock_overrides, name + '_val', 0);
+                }
+            },
+            updateLockVal(name, val) {
+                if (!global.cheats.lock_overrides) this.$set(global.cheats, 'lock_overrides', {});
                 this.$set(global.cheats.lock_overrides, name + '_val', val);
             },
             unlockTechs() {
